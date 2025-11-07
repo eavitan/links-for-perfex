@@ -1,4 +1,8 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
+<?php
+// Get links for this task (database + demo fallback) - moved to top for count badge
+$links = links_for_perfex_get_links('task', isset($task) ? $task->id : 1);
+?>
 <!-- Extended Task Manager - Task Links Section -->
 <div class="task-links-wrapper" style="margin-bottom: 20px;">
     <div class="panel panel-info">
@@ -15,11 +19,6 @@
         <div class="collapse in" id="task-links-collapse">
             <div class="panel-body">
                 <p class="text-muted mbot15"><?php echo _l('task_links_info'); ?></p>
-
-<?php
-// Get links for this task (database + demo fallback)
-$links = links_for_perfex_get_links('task', isset($task) ? $task->id : 1);
-?>
 
 <div class="task-links-section">
     <?php if (count($links) > 0): ?>

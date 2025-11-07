@@ -1,4 +1,8 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
+<?php
+// Get links for this project (database + demo fallback) - moved to top for count badge
+$links = links_for_perfex_get_links('project', $project->id);
+?>
 <!-- Project Links Tab -->
 <div class="tab-pane project-tab-content" role="tabpanel" id="project_links">
     <div class="row">
@@ -15,11 +19,6 @@
 
                 <div class="collapse in" id="project-links-collapse">
                     <p class="text-muted mbot20"><?php echo _l('project_links_info'); ?></p>
-
-                    <?php
-                    // Get links for this project (database + demo fallback)
-                    $links = links_for_perfex_get_links('project', $project->id);
-                    ?>
 
                     <div class="project-links-section">
                     <?php if (count($links) > 0): ?>
