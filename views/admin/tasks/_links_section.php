@@ -261,12 +261,19 @@ function refresh_task_links() {
 function updateLinksDisplay(links) {
     var $linksList = $('.links-list');
     var $noLinksFound = $('.no-links-found');
+    var $taskLinksSection = $('.task-links-section');
 
     if (links.length > 0) {
         // Hide "no links" message
         $noLinksFound.hide();
 
-        // Clear existing links
+        // Create links list container if it doesn't exist
+        if ($linksList.length === 0) {
+            $taskLinksSection.prepend('<div class="links-list"></div>');
+            $linksList = $('.links-list');
+        }
+
+        // Clear existing links and show
         $linksList.empty().show();
 
         // Add each link
@@ -276,7 +283,9 @@ function updateLinksDisplay(links) {
         });
     } else {
         // Show "no links" message and hide links list
-        $linksList.hide();
+        if ($linksList.length > 0) {
+            $linksList.hide();
+        }
         $noLinksFound.show();
     }
 }

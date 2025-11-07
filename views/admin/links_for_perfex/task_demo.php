@@ -23,7 +23,7 @@
                                     <p class="text-muted"><?php echo htmlspecialchars($task->description); ?></p>
 
                                     <!-- This is where our links section will be displayed -->
-                                    <?php $this->load->view('extended_task_manager/admin/tasks/_links_section', ['task' => $task]); ?>
+                                    <?php $this->load->view('admin/tasks/_links_section', ['task' => $task]); ?>
                                 </div>
                             </div>
 
