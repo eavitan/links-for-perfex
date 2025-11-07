@@ -4,12 +4,17 @@
     <div class="panel panel-info">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <i class="fa fa-link mright5"></i>
-                <?php echo _l('task_links'); ?>
+                <a data-toggle="collapse" href="#task-links-collapse" role="button" aria-expanded="true" aria-controls="task-links-collapse" class="text-white" style="text-decoration: none;">
+                    <i class="fa fa-link mright5"></i>
+                    <?php echo _l('task_links'); ?>
+                    <span id="links-count" class="badge badge-light mleft5"><?php echo count($links); ?></span>
+                    <i class="fa fa-chevron-up pull-right mtop5" id="collapse-icon"></i>
+                </a>
             </h4>
         </div>
-        <div class="panel-body">
-            <p class="text-muted mbot15"><?php echo _l('task_links_info'); ?></p>
+        <div class="collapse in" id="task-links-collapse">
+            <div class="panel-body">
+                <p class="text-muted mbot15"><?php echo _l('task_links_info'); ?></p>
 
 <?php
 // Get links for this task (database + demo fallback)
@@ -94,7 +99,8 @@ $links = links_for_perfex_get_links('task', isset($task) ? $task->id : 1);
                 </button>
             </div>
 
-        </div> <!-- End panel-body -->
+            </div> <!-- End panel-body -->
+        </div> <!-- End collapse -->
     </div> <!-- End panel -->
 </div> <!-- End task-links-wrapper -->
 
@@ -288,6 +294,13 @@ function updateLinksDisplay(links) {
         }
         $noLinksFound.show();
     }
+
+    // Update count in panel title
+    updateLinksCount(links.length);
+}
+
+function updateLinksCount(count) {
+    $('#links-count').text(count);
 }
 
 function buildLinkItemHtml(link) {
@@ -345,6 +358,14 @@ function hide_link_form() {
 
 // Form submission handler
 $(document).ready(function() {
+    // Handle collapse/expand icon changes
+    $('#task-links-collapse').on('show.bs.collapse', function () {
+        $('#collapse-icon').removeClass('fa-chevron-down').addClass('fa-chevron-up');
+    });
+
+    $('#task-links-collapse').on('hide.bs.collapse', function () {
+        $('#collapse-icon').removeClass('fa-chevron-up').addClass('fa-chevron-down');
+    });
     $('#link-form').on('submit', function(e) {
         e.preventDefault();
 

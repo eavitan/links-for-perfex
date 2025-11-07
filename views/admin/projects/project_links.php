@@ -5,17 +5,23 @@
         <div class="col-md-12">
             <div class="project-links-wrapper">
                 <h4 class="bold mtop15 mbot15">
-                    <i class="fa fa-link text-primary mright10"></i>
-                    <?php echo _l('project_links'); ?>
+                    <a data-toggle="collapse" href="#project-links-collapse" role="button" aria-expanded="true" aria-controls="project-links-collapse" class="text-primary" style="text-decoration: none;">
+                        <i class="fa fa-link mright5"></i>
+                        <?php echo _l('project_links'); ?>
+                        <span id="project-links-count" class="badge badge-primary mleft5"><?php echo count($links); ?></span>
+                        <i class="fa fa-chevron-up pull-right mtop5" id="project-collapse-icon"></i>
+                    </a>
                 </h4>
-                <p class="text-muted mbot20"><?php echo _l('project_links_info'); ?></p>
 
-                <?php
-                // Get links for this project (database + demo fallback)
-                $links = links_for_perfex_get_links('project', $project->id);
-                ?>
+                <div class="collapse in" id="project-links-collapse">
+                    <p class="text-muted mbot20"><?php echo _l('project_links_info'); ?></p>
 
-                <div class="project-links-section">
+                    <?php
+                    // Get links for this project (database + demo fallback)
+                    $links = links_for_perfex_get_links('project', $project->id);
+                    ?>
+
+                    <div class="project-links-section">
                     <?php if (count($links) > 0): ?>
                         <div class="links-list">
                             <?php foreach ($links as $link): ?>
@@ -114,7 +120,7 @@
                         Database functionality is now active! Demo links show fallback behavior when no real links exist.
                         Add your first real link using the button above.
                     </div>
-                </div>
+                </div> <!-- End collapse -->
             </div>
         </div>
     </div>
@@ -131,6 +137,20 @@
 
 <script>
 // Project Links JavaScript Functions
+$(document).ready(function() {
+    // Handle collapse/expand icon changes
+    $('#project-links-collapse').on('show.bs.collapse', function () {
+        $('#project-collapse-icon').removeClass('fa-chevron-down').addClass('fa-chevron-up');
+    });
+
+    $('#project-links-collapse').on('hide.bs.collapse', function () {
+        $('#project-collapse-icon').removeClass('fa-chevron-up').addClass('fa-chevron-down');
+    });
+});
+
+function updateProjectLinksCount(count) {
+    $('#project-links-count').text(count);
+}
 function add_project_link(project_id) {
     $('#project-link-modal .modal-content').html('<div class="modal-body text-center"><i class="fa fa-spinner fa-spin"></i> Loading...</div>');
     $('#project-link-modal').modal('show');
