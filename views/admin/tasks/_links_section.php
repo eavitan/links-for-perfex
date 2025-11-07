@@ -5,27 +5,27 @@ $links = links_for_perfex_get_links('task', isset($task) ? $task->id : 1);
 ?>
 <!-- Extended Task Manager - Task Links Section -->
 <div class="task-links-wrapper" style="margin-bottom: 20px;">
-    <div class="panel panel-info">
-        <div class="panel-heading">
+    <div class="panel panel-info" style="box-shadow: none;">
+        <div class="panel-heading links-heading" style="background: white; padding: 10px 10px;">
             <h4 class="panel-title">
-                <a data-toggle="collapse" href="#task-links-collapse" role="button" aria-expanded="true" aria-controls="task-links-collapse" class="text-white" style="text-decoration: none;">
+                <a data-toggle="collapse" href="#task-links-collapse" role="button" aria-expanded="false" aria-controls="task-links-collapse" class="text-white" style="text-decoration: none;">
                     <i class="fa fa-link mright5"></i>
                     <?php echo _l('task_links'); ?>
                     <span id="links-count" class="badge badge-light mleft5"><?php echo count($links); ?></span>
-                    <i class="fa fa-chevron-up pull-right mtop5" id="collapse-icon"></i>
+                    <i class="fa pull-right mtop5 fa-chevron-down" id="collapse-icon"></i>
                 </a>
             </h4>
         </div>
-        <div class="collapse in" id="task-links-collapse">
-            <div class="panel-body">
+        <div class="collapse" id="task-links-collapse" aria-expanded="false" style="">
+            <div class="panel-body links-content" style="padding: 10px 10px;">
                 <p class="text-muted mbot15"><?php echo _l('task_links_info'); ?></p>
 
 <div class="task-links-section">
     <?php if (count($links) > 0): ?>
         <div class="links-list">
             <?php foreach ($links as $link): ?>
-                <div class="panel panel-default link-item-panel mbot10" data-link-id="<?php echo $link->id; ?>">
-                    <div class="panel-body">
+                <div class="panel panel-default link-item-panel mbot10" data-link-id="<?php echo $link->id; ?>" style="border: 0px; box-shadow: 2px 2px 7px #afafafb0;">
+                    <div class="panel-body" style="padding: 16px 11px 9px 9px;">
                         <div class="link-header">
                             <h6 class="no-margin">
                                 <i class="fa <?php echo links_for_perfex_get_link_icon($link->url); ?> text-primary mright5"></i>
@@ -33,7 +33,7 @@ $links = links_for_perfex_get_links('task', isset($task) ? $task->id : 1);
                                 $display_title = !empty($link->title) ? htmlspecialchars($link->title) : htmlspecialchars($link->url);
                                 $url = htmlspecialchars($link->url);
                                 ?>
-                                <a href="<?php echo $url; ?>" target="_blank" rel="noopener noreferrer" class="link-url">
+                                <a href="<?php echo $url; ?>" target="_blank" rel="noopener noreferrer" class="link-url" style="font-size: 142%;">
                                     <?php echo $display_title; ?>
                                 </a>
                                 <div class="pull-right">
@@ -53,23 +53,23 @@ $links = links_for_perfex_get_links('task', isset($task) ? $task->id : 1);
                             <div class="link-original-url mtop5">
                                 <small class="text-muted">
                                     <i class="fa fa-external-link mright5"></i>
-                                    <code><?php echo $url; ?></code>
+                                    <code style="background: transparent; color: #9b9b9b; font-size: 10px;"><?php echo $url; ?></code>
                                 </small>
                             </div>
                         <?php endif; ?>
 
                         <!-- Action buttons -->
                         <div class="link-actions mtop10">
-                            <div class="btn-group btn-group-xs pull-right">
+                            <div class="btn-group btn-group-xs pull-right" style="border-radius: 15px; overflow: hidden; border: 0px; box-shadow: 1px 1px 5px #b8b8b8db;">
                                 <?php if (isset($link->is_demo)): ?>
                                     <span class="label label-info">Demo</span>
                                 <?php else: ?>
-                                    <button type="button" class="btn btn-default btn-xs"
+                                    <button type="button" class="btn btn-default btn-xs" style="border: 0px; padding: 3px 14px;"
                                             onclick="edit_link(<?php echo $link->id; ?>);"
                                             data-toggle="tooltip" title="<?php echo _l('edit_link'); ?>">
                                         <i class="fa fa-pencil"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-xs"
+                                    <button type="button" class="btn btn-danger btn-xs" style="border: 0px; padding: 3px 14px;"
                                             onclick="delete_link(<?php echo $link->id; ?>);"
                                             data-toggle="tooltip" title="<?php echo _l('delete_link'); ?>">
                                         <i class="fa fa-trash"></i>
@@ -574,5 +574,9 @@ $(document).ready(function() {
 .task-links-actions {
     border-top: 1px dashed #ddd;
     padding-top: 10px;
+}
+
+.task-links-wrapper a:hover {
+    color: inherit;
 }
 </style>

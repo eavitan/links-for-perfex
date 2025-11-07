@@ -1,6 +1,9 @@
 # Ignore Claude Code documentation
 CLAUDE.md
 
+# Ignore development task tracking
+TASKS.md
+
 # Ignore common temporary files
 .DS_Store
 Thumbs.db
