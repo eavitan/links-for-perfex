@@ -1,0 +1,19 @@
+# Ignore Claude Code documentation
+CLAUDE.md
+
+# Ignore common temporary files
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak
+*.swp
+*~
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.sublime-*
+
+# Ignore OS files
+.directory
+desktop.ini
