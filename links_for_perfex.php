@@ -14,7 +14,9 @@ define('LINKS_FOR_PERFEX_MODULE_NAME', 'links_for_perfex');
 hooks()->add_action('admin_init', 'links_for_perfex_init_menu_items');
 hooks()->add_action('admin_init', 'links_for_perfex_init_project_tabs');
 hooks()->add_filter('get_task', 'links_for_perfex_add_links_to_task');
-hooks()->add_action('before_task_description_section', 'links_for_perfex_render_task_links');
+//hooks()->add_action('before_task_description_section', 'links_for_perfex_render_task_links');
+hooks()->add_action('custom_after_task_description_section', 'links_for_perfex_render_task_links');
+hooks()->add_action('after_add_task', 'links_for_perfex_handle_task_copy');
 
 /**
  * Load the module helper
@@ -132,4 +134,26 @@ function links_for_perfex_render_project_links($project)
 
     // Load and display the project links section
     $CI->load->view(LINKS_FOR_PERFEX_MODULE_NAME . '/admin/projects/_links_section');
+}
+
+/**
+ * Handle task copy operations - copy links from source task to new task
+ */
+function links_for_perfex_handle_task_copy($new_task_id)
+{
+    $CI = &get_instance();
+
+    // Check if this is a copy operation by looking for copy_from in POST data
+    if (isset($_POST['copy_from']) && !empty($_POST['copy_from'])) {
+        $source_task_id = (int) $_POST['copy_from'];
+
+        // Load the links model and copy all links from source to new task
+        $CI->load->model(LINKS_FOR_PERFEX_MODULE_NAME . '/links_model');
+        $copied_count = $CI->links_model->copy_task_links($source_task_id, $new_task_id);
+
+        // Log the copy operation if any links were copied
+        if ($copied_count > 0) {
+            log_activity("Task copy: Copied {$copied_count} links from task {$source_task_id} to task {$new_task_id}");
+        }
+    }
 }

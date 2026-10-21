@@ -305,4 +305,40 @@ class Links_model extends App_Model
 
         return $this->db->get(db_prefix() . 'links_for_perfex')->result();
     }
+
+    /**
+     * Copy all links from source task to destination task
+     * @param int $source_task_id Source task ID
+     * @param int $destination_task_id Destination task ID
+     * @return int Number of links copied
+     */
+    public function copy_task_links($source_task_id, $destination_task_id)
+    {
+        // Get all links from the source task
+        $source_links = $this->get_links('task', $source_task_id);
+
+        $copied_count = 0;
+
+        foreach ($source_links as $link) {
+            // Prepare data for the new link
+            $link_data = [
+                'url' => $link->url,
+                'title' => $link->title,
+                'description' => $link->description,
+                'relation' => 'task',
+                'relation_id' => $destination_task_id,
+                'dateadded' => date('Y-m-d H:i:s'),
+                'addedfrom' => get_staff_user_id()
+            ];
+
+            // Insert the new link
+            $this->db->insert(db_prefix() . 'links_for_perfex', $link_data);
+
+            if ($this->db->affected_rows() > 0) {
+                $copied_count++;
+            }
+        }
+
+        return $copied_count;
+    }
 }
