@@ -320,11 +320,14 @@ function buildLinkItemHtml(link) {
         '</div>';
 }
 
+// The same choice as links_for_perfex_get_link_icon(), for links drawn after a refresh
 function getIconForUrl(url) {
-    if (url.includes('github.com')) return 'fa-github';
-    if (url.includes('google.com') || url.includes('drive.google.com')) return 'fa-google';
-    if (url.includes('figma.com')) return 'fa-paint-brush';
-    if (url.includes('youtube.com') || url.includes('youtu.be')) return 'fa-youtube';
+    url = url.toLowerCase();
+    if (url.includes('github.com')) return 'fa-brands fa-github';
+    if (url.includes('docs.google.com') || url.includes('drive.google.com')) return 'fa-brands fa-google';
+    if (url.includes('figma.com')) return 'fa-brands fa-figma';
+    if (url.includes('youtube.com') || url.includes('youtu.be')) return 'fa-brands fa-youtube';
+    if (url.includes('dropbox.com')) return 'fa-brands fa-dropbox';
     return 'fa-external-link';
 }
 

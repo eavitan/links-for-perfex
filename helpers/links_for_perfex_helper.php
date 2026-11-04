@@ -126,18 +126,19 @@ function links_for_perfex_format_link($link)
  */
 function links_for_perfex_get_link_icon($url)
 {
+    // Font Awesome 6 (Perfex's): the views print "fa " first, and brands need fa-brands
     $url = strtolower($url);
 
     if (strpos($url, 'github.com') !== false) {
-        return 'fa-github';
+        return 'fa-brands fa-github';
     } elseif (strpos($url, 'docs.google.com') !== false || strpos($url, 'drive.google.com') !== false) {
-        return 'fa-google';
+        return 'fa-brands fa-google';
     } elseif (strpos($url, 'figma.com') !== false) {
-        return 'fa-pencil-square-o';
+        return 'fa-brands fa-figma';
     } elseif (strpos($url, 'youtube.com') !== false || strpos($url, 'youtu.be') !== false) {
-        return 'fa-youtube-play';
+        return 'fa-brands fa-youtube';
     } elseif (strpos($url, 'dropbox.com') !== false) {
-        return 'fa-dropbox';
+        return 'fa-brands fa-dropbox';
     } else {
         return 'fa-external-link';
     }

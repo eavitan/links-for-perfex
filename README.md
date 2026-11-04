@@ -148,7 +148,13 @@ The module respects existing Perfex CRM permissions:
 
 ## Version History
 
-### v2.0.2 (2026-11-04, current)
+### v2.0.3 (2026-11-04, current)
+- Google, GitHub, YouTube, Dropbox and Figma links show their icons again. The icon names
+  were Font Awesome 4's; Perfex ships Font Awesome 6, where those are brand icons (fa-brands)
+  and fa-youtube-play / fa-pencil-square-o no longer exist, so the tile was empty. The
+  refresh's JavaScript now picks the same icons as the PHP helper
+
+### v2.0.2 (2026-11-04)
 - The form's "Add Link" / "Edit Link" title and the link buttons' "Edit Link" / "Delete Link"
   tooltips come from the language file: they were typed in English, so a Hebrew admin saw them
   in English after adding or removing a link
