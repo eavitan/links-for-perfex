@@ -82,10 +82,6 @@ $links = links_for_perfex_get_links('task', isset($task) ? $task->id : 1);
                 </div>
             <?php endforeach; ?>
         </div>
-    <?php else: ?>
-        <div class="no-links-found">
-            <p class="text-muted"><?php echo _l('no_links_found'); ?></p>
-        </div>
     <?php endif; ?>
 
             <!-- Add Link Button -->
@@ -265,13 +261,9 @@ function refresh_task_links() {
 
 function updateLinksDisplay(links) {
     var $linksList = $('.links-list');
-    var $noLinksFound = $('.no-links-found');
     var $taskLinksSection = $('.task-links-section');
 
     if (links.length > 0) {
-        // Hide "no links" message
-        $noLinksFound.hide();
-
         // Create links list container if it doesn't exist
         if ($linksList.length === 0) {
             $taskLinksSection.prepend('<div class="links-list"></div>');
@@ -286,12 +278,9 @@ function updateLinksDisplay(links) {
             var linkHtml = buildLinkItemHtml(link);
             $linksList.append(linkHtml);
         });
-    } else {
-        // Show "no links" message and hide links list
-        if ($linksList.length > 0) {
-            $linksList.hide();
-        }
-        $noLinksFound.show();
+    } else if ($linksList.length > 0) {
+        // Emptied, not just hidden: the stylesheet below looks for a link to know there are some
+        $linksList.empty().hide();
     }
 
     // Update count in panel title
@@ -574,6 +563,27 @@ $(document).ready(function() {
 .task-links-actions {
     border-top: 1px dashed #ddd;
     padding-top: 10px;
+}
+
+/* No links: only the line with the two buttons. */
+.task-links-wrapper:not(:has(.link-item-panel)) .panel {
+    margin-bottom: 0;
+    border: 0;
+}
+
+.task-links-wrapper:not(:has(.link-item-panel)) .links-heading,
+.task-links-wrapper:not(:has(.link-item-panel)) .links-content > p {
+    display: none;
+}
+
+.task-links-wrapper:not(:has(.link-item-panel)) .links-content {
+    padding: 0 !important;
+}
+
+.task-links-wrapper:not(:has(.link-item-panel)) .task-links-actions {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
 }
 
 .task-links-wrapper a:hover,

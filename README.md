@@ -148,7 +148,11 @@ The module respects existing Perfex CRM permissions:
 
 ## Version History
 
-### v2.0.0 (Current)
+### v2.0.1 (2026-10-30, current)
+- A task with no links shows only the add and refresh buttons: the title, the help text and
+  "no links found" said nothing the buttons did not
+
+### v2.0.0
 - Complete rewrite with new module structure
 - Database creation moved to install.php (no migrations)
 - Improved UI with integrated forms
