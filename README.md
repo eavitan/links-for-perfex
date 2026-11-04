@@ -148,7 +148,12 @@ The module respects existing Perfex CRM permissions:
 
 ## Version History
 
-### v2.0.1 (2026-10-30, current)
+### v2.0.2 (2026-11-04, current)
+- The form's "Add Link" / "Edit Link" title and the link buttons' "Edit Link" / "Delete Link"
+  tooltips come from the language file: they were typed in English, so a Hebrew admin saw them
+  in English after adding or removing a link
+
+### v2.0.1 (2026-10-30)
 - A task with no links shows only the add and refresh buttons: the title, the help text and
   "no links found" said nothing the buttons did not
 

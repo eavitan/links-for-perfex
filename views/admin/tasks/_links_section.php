@@ -105,7 +105,7 @@ $links = links_for_perfex_get_links('task', isset($task) ? $task->id : 1);
         <div class="panel-heading">
             <h5 class="panel-title">
                 <i class="fa fa-plus mright5"></i>
-                <span id="link-form-title">Add Link</span>
+                <span id="link-form-title"><?php echo _l('add_link'); ?></span>
                 <button type="button" class="close" onclick="hide_link_form();" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -174,7 +174,7 @@ function add_task_link(task_id) {
     // Reset form for adding new link
     $('#link-form')[0].reset();
     $('#link_id').val('');
-    $('#link-form-title').text('Add Link');
+    $('#link-form-title').text('<?php echo _l('add_link'); ?>');
     $('#submit-text').text('<?php echo _l('save'); ?>');
     $('input[name="relation_id"]').val(task_id);
 
@@ -193,7 +193,7 @@ function edit_link(link_id) {
                 $('#url').val(link.url);
                 $('#title').val(link.title);
                 $('#description').val(link.description);
-                $('#link-form-title').text('Edit Link');
+                $('#link-form-title').text('<?php echo _l('edit_link'); ?>');
                 $('#submit-text').text('<?php echo _l('update'); ?>');
 
                 // Show the form
@@ -311,8 +311,8 @@ function buildLinkItemHtml(link) {
         originalUrl +
         '<div class="link-actions mtop10">' +
         '<div class="btn-group btn-group-xs pull-right" style="border-radius: 15px; overflow: hidden; border: 0px; box-shadow: 1px 1px 5px #b8b8b8db;">' +
-        '<button type="button" class="btn btn-default btn-xs" style="border: 0px; padding: 3px 14px;" onclick="edit_link(' + link.id + ');" data-toggle="tooltip" title="Edit Link"><i class="fa fa-pencil"></i></button>' +
-        '<button type="button" class="btn btn-danger btn-xs" style="border: 0px; padding: 3px 14px;" onclick="delete_link(' + link.id + ');" data-toggle="tooltip" title="Delete Link"><i class="fa fa-trash"></i></button>' +
+        '<button type="button" class="btn btn-default btn-xs" style="border: 0px; padding: 3px 14px;" onclick="edit_link(' + link.id + ');" data-toggle="tooltip" title="<?php echo _l('edit_link'); ?>"><i class="fa fa-pencil"></i></button>' +
+        '<button type="button" class="btn btn-danger btn-xs" style="border: 0px; padding: 3px 14px;" onclick="delete_link(' + link.id + ');" data-toggle="tooltip" title="<?php echo _l('delete_link'); ?>"><i class="fa fa-trash"></i></button>' +
         '</div>' +
         '<div class="clearfix"></div>' +
         '</div>' +
@@ -454,7 +454,7 @@ $(document).ready(function() {
         // Reset form for adding new link
         $('#link-form')[0].reset();
         $('#link_id').val('');
-        $('#link-form-title').text('Add Link');
+        $('#link-form-title').text('<?php echo _l('add_link'); ?>');
         $('#submit-text').text('<?php echo _l('save'); ?>');
         $('input[name="relation_id"]').val(task_id);
 
@@ -499,7 +499,7 @@ $(document).ready(function() {
 
                     console.log('Description field value after setting:', $description.val());
 
-                    $('#link-form-title').text('Edit Link');
+                    $('#link-form-title').text('<?php echo _l('edit_link'); ?>');
                     $('#submit-text').text('<?php echo _l('update'); ?>');
 
                     // Show the form first
