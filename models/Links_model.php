@@ -70,6 +70,15 @@ class Links_model extends App_Model
             return false;
         }
 
+        // No title: the page's, and its description when none was given either (Eyal, 2026-11-11)
+        if (empty($insert_data['title'])) {
+            $page                  = links_for_perfex_fetch_page_meta($insert_data['url']);
+            $insert_data['title']  = $page['title'] ?: null;
+            if (empty($insert_data['description'])) {
+                $insert_data['description'] = $page['description'] ?: null;
+            }
+        }
+
         $this->db->insert(db_prefix() . 'links_for_perfex', $insert_data);
 
         $insert_id = $this->db->insert_id();
@@ -127,6 +136,16 @@ class Links_model extends App_Model
 
         if (empty($update_data)) {
             return false;
+        }
+
+        // A title cleared or left empty is filled from the page, as on add
+        if (array_key_exists('title', $update_data) && $update_data['title'] === null) {
+            $page                 = links_for_perfex_fetch_page_meta($update_data['url'] ?? $existing_link->url);
+            $update_data['title'] = $page['title'] ?: null;
+            $description          = array_key_exists('description', $update_data) ? $update_data['description'] : $existing_link->description;
+            if (empty($description)) {
+                $update_data['description'] = $page['description'] ?: null;
+            }
         }
 
         $this->db->where('id', $id);
@@ -304,6 +323,32 @@ class Links_model extends App_Model
         $this->db->order_by('dateadded', 'DESC');
 
         return $this->db->get(db_prefix() . 'links_for_perfex')->result();
+    }
+
+    /**
+     * A project's Links tab: the project's own links, then those of its tasks the staff member
+     * can see (Perfex's own task visibility), each with task_name.
+     * @param int $project_id
+     * @return array Array of link objects
+     */
+    public function get_project_all_links($project_id)
+    {
+        $this->db->select('id, name')->where('rel_type', 'project')->where('rel_id', (int) $project_id);
+        if (!has_permission('tasks', '', 'view')) {
+            $this->db->where(get_tasks_where_string(false), null, false);
+        }
+        $tasks = array_column($this->db->get(db_prefix() . 'tasks')->result_array(), 'name', 'id');
+
+        $links = $this->get_links('project', (int) $project_id);
+        if ($tasks) {
+            $this->db->where('relation', 'task')->where_in('relation_id', array_keys($tasks))->order_by('dateadded', 'DESC');
+            foreach ($this->db->get(db_prefix() . 'links_for_perfex')->result() as $link) {
+                $link->task_name = $tasks[$link->relation_id];
+                $links[]         = $link;
+            }
+        }
+
+        return $links;
     }
 
     /**

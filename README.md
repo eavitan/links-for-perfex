@@ -44,6 +44,7 @@ To uninstall:
 ### Project Links
 - Open any project
 - Click the "Links" tab (appears next to Overview, Tasks, etc.)
+- The project's own links, then every link on its tasks (with the task's name)
 - Manage all project-related links in one organized location
 - Perfect for project documentation, repositories, design files
 
@@ -128,7 +129,7 @@ modules/links_for_perfex/
 
 - `admin_init` → Menu items and project tabs
 - `get_task` → Add links data to task objects
-- `before_task_description_section` → Inject task links section
+- `custom_after_task_description_section` → Inject task links section
 
 ## Permissions
 
@@ -148,7 +149,23 @@ The module respects existing Perfex CRM permissions:
 
 ## Version History
 
-### v2.0.3 (2026-11-04, current)
+### v2.0.4 (2026-11-11, current)
+- **A link saved with no title takes the page's.** Eyal: "if there's no title fetch the title
+  and then save it as the title field". The page's og:title or `<title>` becomes the title; its
+  meta description becomes the description when that was left empty too. A title given means
+  no fetch. In `Links_model` (add, and edit when the title is cleared), so the task popup, the
+  project tab and the headless app all get it. `links_for_perfex_fetch_page_meta()` reads only
+  public http(s) addresses: each redirect hop is resolved, refused when it points at a private
+  or reserved IP, and pinned to that IP; 6 s and 512 KB in all; 2xx pages only; a redirect to a
+  sign-in page (a private Google Doc) gives nothing. Test: `php tests/links_for_perfex/fetch_page_meta_test.php --live`
+- **The project's Links tab shows every task's links.** Eyal: "display all the links from all
+  tasks, including the one that I'll set for the project itself". The project's own links come
+  first, then its tasks' — only tasks the staff member may see, by Perfex's own rule — each with
+  its task's name, which opens the task. Same card markup as the task popup, so Slick v2 draws
+  both alike (`slick_ui` 1.5.1). The tab's "Phase 2 Active" demo notice and its fold are gone
+- Migration 204, empty
+
+### v2.0.3 (2026-11-04)
 - Google, GitHub, YouTube, Dropbox and Figma links show their icons again. The icon names
   were Font Awesome 4's; Perfex ships Font Awesome 6, where those are brand icons (fa-brands)
   and fa-youtube-play / fa-pencil-square-o no longer exist, so the tile was empty. The

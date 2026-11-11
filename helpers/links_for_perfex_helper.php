@@ -120,6 +120,102 @@ function links_for_perfex_format_link($link)
 }
 
 /**
+ * A page's title and meta description, for a link saved without a title (2.0.4).
+ * Only public addresses: each hop's host must resolve to a public IP, and the request is pinned to
+ * that IP, so a link cannot make the CRM read its own network. 6 s and 512 KB in all, 2xx only.
+ * @param string $url
+ * @return array ['title' => string, 'description' => string], '' for what was not found
+ */
+function links_for_perfex_fetch_page_meta($url)
+{
+    $none     = ['title' => '', 'description' => ''];
+    $start    = $url;
+    $deadline = microtime(true) + 6;
+
+    for ($hop = 0; ; $hop++) {
+        $parts  = parse_url($url);
+        $scheme = strtolower($parts['scheme'] ?? '');
+        $host   = $parts['host'] ?? '';
+        $left   = (int) (($deadline - microtime(true)) * 1000);
+        if ($hop > 5 || $left < 200 || !in_array($scheme, ['http', 'https'], true) || $host === '') {
+            return $none;
+        }
+        $ip = filter_var($host, FILTER_VALIDATE_IP) ? $host : gethostbyname($host);
+        if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+            return $none;
+        }
+        $port = $parts['port'] ?? ($scheme === 'https' ? 443 : 80);
+
+        $html = '';
+        $ch   = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RESOLVE           => [$host . ':' . $port . ':' . $ip],
+            CURLOPT_FOLLOWLOCATION    => false, // each redirect is checked above, on the next hop
+            CURLOPT_PROTOCOLS         => CURLPROTO_HTTP | CURLPROTO_HTTPS,
+            CURLOPT_CONNECTTIMEOUT_MS => min(3000, $left),
+            CURLOPT_TIMEOUT_MS        => $left,
+            CURLOPT_USERAGENT         => 'Mozilla/5.0 (compatible; LinksForPerfex)',
+            CURLOPT_HTTPHEADER        => ['Accept: text/html', 'Accept-Language: he,en;q=0.8'],
+            CURLOPT_ENCODING          => '',
+            CURLOPT_WRITEFUNCTION     => function ($ch, $chunk) use (&$html) {
+                $html .= $chunk;
+
+                return strlen($html) > 524288 ? 0 : strlen($chunk); // the head is long read by then
+            },
+        ]);
+        curl_exec($ch);
+        $code = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+        $next = (string) curl_getinfo($ch, CURLINFO_REDIRECT_URL);
+        $type = (string) curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+        curl_close($ch);
+
+        if ($code >= 300 && $code < 400 && $next !== '') {
+            $url = $next;
+            continue;
+        }
+        break;
+    }
+
+    // A private Google Doc answers with Google's sign-in page; its title is not the link's.
+    // shortcut: known sign-in addresses only, extend the pattern when another one shows up
+    if ($code < 200 || $code >= 300 || $html === '' || ($type !== '' && stripos($type, 'html') === false)
+        || ($url !== $start && preg_match('#^https?://(accounts|login|signin)\.|/(sign-?in|log-?in|servicelogin)\b#i', $url))) {
+        return $none;
+    }
+
+    if (preg_match('/charset=["\']?([\w-]+)/i', $type . ' ' . substr($html, 0, 4096), $m) && strcasecmp($m[1], 'utf-8') !== 0) {
+        $converted = @iconv($m[1], 'UTF-8//IGNORE', $html);
+        $html      = $converted !== false ? $converted : $html;
+    }
+
+    $doc = new DOMDocument();
+    $quiet = libxml_use_internal_errors(true);
+    $doc->loadHTML('<?xml encoding="UTF-8">' . $html);
+    libxml_clear_errors();
+    libxml_use_internal_errors($quiet);
+
+    $meta = [];
+    foreach ($doc->getElementsByTagName('meta') as $tag) {
+        $key = strtolower($tag->getAttribute('property') ?: $tag->getAttribute('name'));
+        if ($key !== '' && !isset($meta[$key])) {
+            $meta[$key] = $tag->getAttribute('content');
+        }
+    }
+    $titleTag = $doc->getElementsByTagName('title')->item(0);
+
+    $clean = function ($s, $max) {
+        $s = trim(preg_replace('/\s+/u', ' ', (string) $s) ?? '');
+
+        return mb_check_encoding($s, 'UTF-8') ? mb_substr($s, 0, $max) : '';
+    };
+
+    return [
+        'title'       => $clean(($meta['og:title'] ?? '') ?: ($titleTag ? $titleTag->textContent : ''), 255),
+        'description' => $clean(($meta['description'] ?? '') ?: ($meta['og:description'] ?? ''), 1000),
+    ];
+}
+
+/**
  * Get link icon based on URL
  * @param string $url The URL to analyze
  * @return string Font Awesome icon class

@@ -1,126 +1,95 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php
-// Get links for this project (database + demo fallback) - moved to top for count badge
-$links = links_for_perfex_get_links('project', $project->id);
+// The project's own links, then its tasks' (Eyal, 2026-11-11). The cards are the task popup's
+// markup, so slick_ui draws both with the same rules.
+$CI = &get_instance();
+$CI->load->model('links_for_perfex/links_model');
+$links = $CI->links_model->get_project_all_links($project->id);
 ?>
 <!-- Project Links Tab -->
 <div class="tab-pane project-tab-content" role="tabpanel" id="project_links">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="project-links-wrapper">
-                <h4 class="bold mtop15 mbot15">
-                    <a data-toggle="collapse" href="#project-links-collapse" role="button" aria-expanded="true" aria-controls="project-links-collapse" class="text-primary" style="text-decoration: none;">
-                        <i class="fa fa-link mright5"></i>
-                        <?php echo _l('project_links'); ?>
-                        <span id="project-links-count" class="badge badge-primary mleft5"><?php echo count($links); ?></span>
-                        <i class="fa fa-chevron-up pull-right mtop5" id="project-collapse-icon"></i>
-                    </a>
-                </h4>
+    <div class="project-links-wrapper">
+        <h4 class="project-links-heading bold mtop15 mbot15">
+            <?php echo _l('links'); ?>
+            <span id="project-links-count" class="badge mleft5"><?php echo count($links); ?></span>
+        </h4>
 
-                <div class="collapse in" id="project-links-collapse">
-                    <p class="text-muted mbot20"><?php echo _l('project_links_info'); ?></p>
-
-                    <div class="project-links-section">
-                    <?php if (count($links) > 0): ?>
-                        <div class="links-list">
-                            <?php foreach ($links as $link): ?>
-                                <div class="panel panel-default link-item-panel" data-link-id="<?php echo $link->id; ?>">
-                                    <div class="panel-body">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="link-header">
-                                                    <h5 class="no-margin">
-                                                        <i class="fa <?php echo links_for_perfex_get_link_icon($link->url); ?> text-primary mright10"></i>
-                                                        <?php
-                                                        $display_title = !empty($link->title) ? htmlspecialchars($link->title) : htmlspecialchars($link->url);
-                                                        $url = htmlspecialchars($link->url);
-                                                        ?>
-                                                        <a href="<?php echo $url; ?>" target="_blank" rel="noopener noreferrer" class="link-url">
-                                                            <strong><?php echo $display_title; ?></strong>
-                                                        </a>
-                                                        <div class="pull-right">
-                                                            <small class="text-muted">
-                                                                <?php echo _dt($link->dateadded); ?>
-                                                            </small>
-                                                        </div>
-                                                        <div class="clearfix"></div>
-                                                    </h5>
-                                                </div>
-
-                                                <?php if (!empty($link->description)): ?>
-                                                    <div class="link-description mtop10">
-                                                        <p class="text-muted"><?php echo htmlspecialchars($link->description); ?></p>
-                                                    </div>
-                                                <?php endif; ?>
-
-                                                <?php if (!empty($link->title) && $link->title !== $link->url): ?>
-                                                    <div class="link-original-url mtop5">
-                                                        <small class="text-muted">
-                                                            <i class="fa fa-external-link mright5"></i>
-                                                            <code><?php echo $url; ?></code>
-                                                        </small>
-                                                    </div>
-                                                <?php endif; ?>
-
-                                                <!-- Action buttons -->
-                                                <div class="link-actions mtop10">
-                                                    <div class="btn-group btn-group-xs">
-                                                        <?php if (isset($link->is_demo)): ?>
-                                                            <span class="label label-info">Demo</span>
-                                                        <?php else: ?>
-                                                            <button type="button" class="btn btn-default"
-                                                                    onclick="edit_project_link(<?php echo $link->id; ?>);"
-                                                                    data-toggle="tooltip" title="<?php echo _l('edit_link'); ?>">
-                                                                <i class="fa fa-pencil"></i>
-                                                            </button>
-                                                            <button type="button" class="btn btn-danger"
-                                                                    onclick="delete_project_link(<?php echo $link->id; ?>);"
-                                                                    data-toggle="tooltip" title="<?php echo _l('delete_link'); ?>">
-                                                                <i class="fa fa-trash"></i>
-                                                            </button>
-                                                        <?php endif; ?>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+        <div class="project-links-list">
+            <?php foreach ($links as $link): ?>
+                <?php
+                $display_title = !empty($link->title) ? htmlspecialchars($link->title) : htmlspecialchars($link->url);
+                $url = htmlspecialchars($link->url);
+                ?>
+                <div class="panel panel-default link-item-panel mbot10" data-link-id="<?php echo $link->id; ?>" style="border: 0px; box-shadow: 2px 2px 7px #afafafb0;">
+                    <div class="panel-body" style="padding: 16px 11px 9px 9px;">
+                        <div class="link-header">
+                            <h6 class="no-margin">
+                                <i class="fa <?php echo links_for_perfex_get_link_icon($link->url); ?> text-primary mright5"></i>
+                                <a href="<?php echo $url; ?>" target="_blank" rel="noopener noreferrer" class="link-url" style="font-size: 142%;">
+                                    <?php echo $display_title; ?>
+                                </a>
+                                <div class="pull-right">
+                                    <small class="text-muted"><?php echo _dt($link->dateadded); ?></small>
                                 </div>
-                            <?php endforeach; ?>
+                                <div class="clearfix"></div>
+                            </h6>
                         </div>
-                    <?php else: ?>
-                        <div class="no-links-found text-center">
-                            <div class="empty-state mtop30 mbot30">
-                                <i class="fa fa-link fa-4x text-muted mbot15"></i>
-                                <h3 class="text-muted"><?php echo _l('no_links_found'); ?></h3>
-                                <p class="text-muted">Add relevant links and resources to keep everything organized.</p>
-                            </div>
-                        </div>
-                    <?php endif; ?>
 
-                    <!-- Add Link Button -->
-                    <div class="project-links-actions mtop20">
-                        <?php if (has_permission('projects', '', 'edit') || $project->addedfrom == get_staff_user_id()): ?>
-                            <button type="button" class="btn btn-primary"
-                                    onclick="add_project_link(<?php echo $project->id; ?>);">
-                                <i class="fa fa-plus mright5"></i>
-                                <?php echo _l('add_project_link'); ?>
-                            </button>
+                        <?php if (!empty($link->description)): ?>
+                            <div class="link-description mtop5">
+                                <small class="text-muted"><?php echo htmlspecialchars($link->description); ?></small>
+                            </div>
                         <?php endif; ?>
 
-                        <button type="button" class="btn btn-default" onclick="refresh_project_links();">
-                            <i class="fa fa-refresh mright5"></i>
-                            <?php echo _l('refresh_links'); ?>
-                        </button>
-                    </div>
+                        <?php if (!empty($link->title) && $link->title !== $link->url): ?>
+                            <div class="link-original-url mtop5">
+                                <small class="text-muted">
+                                    <i class="fa fa-external-link mright5"></i>
+                                    <code style="background: transparent; color: #9b9b9b; font-size: 10px;"><?php echo $url; ?></code>
+                                </small>
+                            </div>
+                        <?php endif; ?>
 
-                    <!-- Demo Information -->
-                    <div class="alert alert-info mtop20">
-                        <strong><i class="fa fa-info-circle mright5"></i>Phase 2 Active:</strong>
-                        Database functionality is now active! Demo links show fallback behavior when no real links exist.
-                        Add your first real link using the button above.
+                        <?php if (isset($link->task_name)): ?>
+                            <div class="link-task mtop5">
+                                <i class="fa-regular fa-circle-check mright5"></i>
+                                <a href="<?php echo admin_url('tasks/view/' . $link->relation_id); ?>" onclick="init_task_modal(<?php echo (int) $link->relation_id; ?>); return false;"><?php echo htmlspecialchars($link->task_name); ?></a>
+                            </div>
+                        <?php endif; ?>
+
+                        <div class="link-actions mtop10">
+                            <div class="btn-group btn-group-xs pull-right" style="border-radius: 15px; overflow: hidden; border: 0px; box-shadow: 1px 1px 5px #b8b8b8db;">
+                                <button type="button" class="btn btn-default btn-xs" style="border: 0px; padding: 3px 14px;"
+                                        onclick="edit_project_link(<?php echo $link->id; ?>);"
+                                        data-toggle="tooltip" title="<?php echo _l('edit_link'); ?>">
+                                    <i class="fa fa-pencil"></i>
+                                </button>
+                                <button type="button" class="btn btn-danger btn-xs" style="border: 0px; padding: 3px 14px;"
+                                        onclick="delete_project_link(<?php echo $link->id; ?>);"
+                                        data-toggle="tooltip" title="<?php echo _l('delete_link'); ?>">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
                     </div>
-                </div> <!-- End collapse -->
-            </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+
+        <?php if (count($links) === 0): ?>
+            <p class="no-links-found text-muted"><?php echo _l('no_links_found'); ?></p>
+        <?php endif; ?>
+
+        <div class="project-links-actions mtop15">
+            <?php if (has_permission('projects', '', 'edit') || $project->addedfrom == get_staff_user_id()): ?>
+                <button type="button" class="btn btn-info btn-sm" onclick="add_project_link(<?php echo $project->id; ?>);">
+                    <i class="fa fa-plus"></i> <?php echo _l('add_project_link'); ?>
+                </button>
+            <?php endif; ?>
+            <button type="button" class="btn btn-default btn-sm" onclick="refresh_project_links();">
+                <i class="fa fa-refresh"></i> <?php echo _l('refresh_links'); ?>
+            </button>
         </div>
     </div>
 </div>
@@ -136,17 +105,6 @@ $links = links_for_perfex_get_links('project', $project->id);
 
 <script>
 // Project Links JavaScript Functions
-$(document).ready(function() {
-    // Handle collapse/expand icon changes
-    $('#project-links-collapse').on('show.bs.collapse', function () {
-        $('#project-collapse-icon').removeClass('fa-chevron-down').addClass('fa-chevron-up');
-    });
-
-    $('#project-links-collapse').on('hide.bs.collapse', function () {
-        $('#project-collapse-icon').removeClass('fa-chevron-up').addClass('fa-chevron-down');
-    });
-});
-
 function updateProjectLinksCount(count) {
     $('#project-links-count').text(count);
 }
@@ -203,56 +161,8 @@ function refresh_links_section() {
 }
 </script>
 
-<!-- Custom CSS for project links styling -->
 <style>
-.project-links-wrapper .link-item-panel {
-    border-left: 4px solid #3498db;
-    transition: all 0.3s ease;
-}
-
-.project-links-wrapper .link-item-panel:hover {
-    border-left-color: #2980b9;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.project-links-wrapper .link-url {
-    font-size: 16px;
-    text-decoration: none;
-    color: #3498db;
-}
-
-.project-links-wrapper .link-url:hover {
-    text-decoration: underline;
-    color: #2980b9;
-}
-
-.project-links-wrapper .link-description {
-    font-size: 14px;
-    line-height: 1.5;
-}
-
-.project-links-wrapper .link-original-url {
-    word-break: break-all;
-    font-size: 12px;
-}
-
-.project-links-wrapper .link-original-url code {
-    background-color: #f8f9fa;
-    color: #6c757d;
-    font-size: 11px;
-}
-
-.project-links-wrapper .empty-state {
-    padding: 40px 20px;
-}
-
-.project-links-wrapper .project-links-actions {
-    border-top: 1px dashed #ddd;
-    padding-top: 20px;
-}
-
-.project-links-wrapper .link-actions {
-    border-top: 1px solid #eee;
-    padding-top: 10px;
-}
+.project-links-wrapper .link-url { font-weight: bold; text-decoration: none; }
+.project-links-wrapper .link-original-url { word-break: break-all; }
+.project-links-actions { border-top: 1px dashed #ddd; padding-top: 10px; }
 </style>
