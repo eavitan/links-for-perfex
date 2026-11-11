@@ -5,6 +5,18 @@
 $CI = &get_instance();
 $CI->load->model('links_for_perfex/links_model');
 $links = $CI->links_model->get_project_all_links($project->id);
+
+// The filters list only the tasks and milestones that have links, milestones in the project's order
+$filter_tasks      = [];
+$filter_milestones = [];
+foreach ($links as $link) {
+    if (isset($link->task_name)) {
+        $filter_tasks[$link->relation_id]      = $link->task_name;
+        $filter_milestones[$link->milestone] = [(int) $link->milestone_order, $link->milestone_name ?: _l('links_filter_no_milestone')];
+    }
+}
+asort($filter_tasks);
+asort($filter_milestones);
 ?>
 <!-- Project Links Tab -->
 <div class="tab-pane project-tab-content" role="tabpanel" id="project_links">
@@ -14,13 +26,32 @@ $links = $CI->links_model->get_project_all_links($project->id);
             <span id="project-links-count" class="badge mleft5"><?php echo count($links); ?></span>
         </h4>
 
+        <?php if ($filter_tasks): ?>
+            <div class="project-links-filters">
+                <select id="project-links-milestone" class="selectpicker" data-width="240px" data-live-search="true">
+                    <option value=""><?php echo _l('links_filter_all_milestones'); ?></option>
+                    <?php foreach ($filter_milestones as $id => $milestone): ?>
+                        <option value="<?php echo $id; ?>"><?php echo htmlspecialchars($milestone[1]); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <select id="project-links-task" class="selectpicker" data-width="240px" data-live-search="true">
+                    <option value=""><?php echo _l('links_filter_all_tasks'); ?></option>
+                    <?php foreach ($filter_tasks as $id => $name): ?>
+                        <option value="<?php echo $id; ?>"><?php echo htmlspecialchars($name); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        <?php endif; ?>
+
         <div class="project-links-list">
             <?php foreach ($links as $link): ?>
                 <?php
                 $display_title = !empty($link->title) ? htmlspecialchars($link->title) : htmlspecialchars($link->url);
                 $url = htmlspecialchars($link->url);
                 ?>
-                <div class="panel panel-default link-item-panel mbot10" data-link-id="<?php echo $link->id; ?>" style="border: 0px; box-shadow: 2px 2px 7px #afafafb0;">
+                <div class="panel panel-default link-item-panel mbot10" data-link-id="<?php echo $link->id; ?>"
+                     data-task="<?php echo isset($link->task_name) ? (int) $link->relation_id : ''; ?>"
+                     data-milestone="<?php echo isset($link->task_name) ? $link->milestone : ''; ?>" style="border: 0px; box-shadow: 2px 2px 7px #afafafb0;">
                     <div class="panel-body" style="padding: 16px 11px 9px 9px;">
                         <div class="link-header">
                             <h6 class="no-margin">
@@ -77,9 +108,7 @@ $links = $CI->links_model->get_project_all_links($project->id);
             <?php endforeach; ?>
         </div>
 
-        <?php if (count($links) === 0): ?>
-            <p class="no-links-found text-muted"><?php echo _l('no_links_found'); ?></p>
-        <?php endif; ?>
+        <p class="no-links-found text-muted"<?php echo count($links) ? ' hidden' : ''; ?>><?php echo _l('no_links_found'); ?></p>
 
         <div class="project-links-actions mtop15">
             <?php if (has_permission('projects', '', 'edit') || $project->addedfrom == get_staff_user_id()): ?>
@@ -108,6 +137,26 @@ $links = $CI->links_model->get_project_all_links($project->id);
 function updateProjectLinksCount(count) {
     $('#project-links-count').text(count);
 }
+
+// The filters: both apply together; the project's own links show only with neither set.
+// jQuery loads in the page's footer, after this tab: bind once the page has parsed.
+document.addEventListener('DOMContentLoaded', function () {
+    $('#project-links-milestone, #project-links-task').on('change', function () {
+        var milestone = $('#project-links-milestone').val();
+        var task = $('#project-links-task').val();
+        var shown = 0;
+
+        $('#project_links .link-item-panel').each(function () {
+            var on = (milestone === '' || $(this).attr('data-milestone') === milestone)
+                && (task === '' || $(this).attr('data-task') === task);
+            $(this).toggle(on);
+            shown += on ? 1 : 0;
+        });
+
+        updateProjectLinksCount(shown);
+        $('#project_links .no-links-found').prop('hidden', shown > 0);
+    });
+});
 function add_project_link(project_id) {
     $('#project-link-modal .modal-content').html('<div class="modal-body text-center"><i class="fa fa-spinner fa-spin"></i> Loading...</div>');
     $('#project-link-modal').modal('show');
@@ -162,6 +211,7 @@ function refresh_links_section() {
 </script>
 
 <style>
+.project-links-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
 .project-links-wrapper .link-url { font-weight: bold; text-decoration: none; }
 .project-links-wrapper .link-original-url { word-break: break-all; }
 .project-links-actions { border-top: 1px dashed #ddd; padding-top: 10px; }

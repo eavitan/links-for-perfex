@@ -44,7 +44,7 @@ To uninstall:
 ### Project Links
 - Open any project
 - Click the "Links" tab (appears next to Overview, Tasks, etc.)
-- The project's own links, then every link on its tasks (with the task's name)
+- The project's own links, then every link on its tasks (with the task's name), filtered by milestone or task
 - Manage all project-related links in one organized location
 - Perfect for project documentation, repositories, design files
 
@@ -149,7 +149,14 @@ The module respects existing Perfex CRM permissions:
 
 ## Version History
 
-### v2.0.4 (2026-11-11, current)
+### v2.0.5 (2026-11-11, current)
+- **The project's Links tab filters by milestone and by task.** Eyal: "I want to filter those
+  links by milestone or by task". Two dropdowns above the cards list only the milestones and
+  tasks that have links ("No milestone" for tasks without one, a deleted milestone counting as
+  none); both apply together, on the page, and the count follows. The project's own links show
+  only with neither set. Migration 205, empty
+
+### v2.0.4 (2026-11-11)
 - **A link saved with no title takes the page's.** Eyal: "if there's no title fetch the title
   and then save it as the title field". The page's og:title or `<title>` becomes the title; its
   meta description becomes the description when that was left empty too. A title given means

@@ -21,6 +21,9 @@ $lang['add_task_link'] = 'הוסף קישור למשימה';
 $lang['task_links_info'] = 'צרף קישורים ומשאבים רלוונטיים למשימה זו';
 
 # Project Links
+$lang['links_filter_all_milestones'] = 'כל אבני הדרך';
+$lang['links_filter_all_tasks'] = 'כל המשימות';
+$lang['links_filter_no_milestone'] = 'ללא אבן דרך';
 $lang['project_links'] = 'קישורי פרויקט';
 $lang['add_project_link'] = 'הוסף קישור לפרויקט';
 $lang['project_links_info'] = 'צרף קישורים ומשאבים רלוונטיים לפרויקט זה';

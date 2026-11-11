@@ -20,6 +20,9 @@ $lang['add_task_link'] = 'Add Task Link';
 $lang['task_links_info'] = 'Attach relevant links and resources to this task';
 
 # Project Links
+$lang['links_filter_all_milestones'] = 'All milestones';
+$lang['links_filter_all_tasks'] = 'All tasks';
+$lang['links_filter_no_milestone'] = 'No milestone';
 $lang['project_links'] = 'Project Links';
 $lang['add_project_link'] = 'Add Project Link';
 $lang['project_links_info'] = 'Attach relevant links and resources to this project';

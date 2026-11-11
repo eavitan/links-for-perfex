@@ -327,24 +327,32 @@ class Links_model extends App_Model
 
     /**
      * A project's Links tab: the project's own links, then those of its tasks the staff member
-     * can see (Perfex's own task visibility), each with task_name.
+     * can see (Perfex's own task visibility), each with task_name and its milestone (id, 0 for
+     * none; milestone_name, milestone_order) for the tab's filters.
      * @param int $project_id
      * @return array Array of link objects
      */
     public function get_project_all_links($project_id)
     {
-        $this->db->select('id, name')->where('rel_type', 'project')->where('rel_id', (int) $project_id);
+        $t = db_prefix() . 'tasks';
+        $this->db->select($t . '.id, ' . $t . '.name, ' . $t . '.milestone, m.name AS milestone_name, m.milestone_order')
+            ->join(db_prefix() . 'milestones m', 'm.id = ' . $t . '.milestone', 'left')
+            ->where($t . '.rel_type', 'project')->where($t . '.rel_id', (int) $project_id);
         if (!has_permission('tasks', '', 'view')) {
             $this->db->where(get_tasks_where_string(false), null, false);
         }
-        $tasks = array_column($this->db->get(db_prefix() . 'tasks')->result_array(), 'name', 'id');
+        $tasks = array_column($this->db->get($t)->result_array(), null, 'id');
 
         $links = $this->get_links('project', (int) $project_id);
         if ($tasks) {
             $this->db->where('relation', 'task')->where_in('relation_id', array_keys($tasks))->order_by('dateadded', 'DESC');
             foreach ($this->db->get(db_prefix() . 'links_for_perfex')->result() as $link) {
-                $link->task_name = $tasks[$link->relation_id];
-                $links[]         = $link;
+                $task                  = $tasks[$link->relation_id];
+                $link->task_name       = $task['name'];
+                $link->milestone       = $task['milestone_name'] === null ? 0 : (int) $task['milestone']; // a deleted milestone counts as none
+                $link->milestone_name  = $task['milestone_name'];
+                $link->milestone_order = $task['milestone_order'];
+                $links[]               = $link;
             }
         }
 

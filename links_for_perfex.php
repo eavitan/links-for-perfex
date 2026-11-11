@@ -5,7 +5,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 /*
 Module Name: Links for Perfex
 Description: Add link management functionality to tasks and projects in Perfex CRM
-Version: 2.0.4
+Version: 2.0.5
 Author: Custom Development
 */
 
